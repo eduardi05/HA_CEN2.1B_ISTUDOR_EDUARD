@@ -1,1 +1,472 @@
+\documentclass{article}
+\usepackage{graphicx} 
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\title{%
+  Artificial Intelligence Homework \\
+  \large The Traveling Salesman Problem
+}
+\author{Istudor Eduard CEN2.1B}
+\date{May 2024}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+\end{titlepage}
+
+\section{Introduction}
+\url{https://github.com/eduardi05/HA_CEN2.1B_ISTUDOR_EDUARD}
+
+\section{Problem statement}
+Traveling Salesman Problem:
+\\
+Given a list of cities and the distances between each pair of cities, what is the route of minimum cost that visits each city exactly once and returns to the origin city? The cost function of the solution must be the minimization of the longest distance between two consecutive cities.
+
+\section{Pseudocode of the Algorithms}
+
+\subsection{Breadth-First Search Pseudocode}
+\begin{lstlisting}[language=Python]
+function TSP_BFS(dist, n):
+    q <- new Queue
+    root <- new Node
+    root.path <- [0]
+    root.cost <- 0
+    root.level <- 0
+    q.push(root)
+    min_cost <- INFINITY
+
+    while q is not empty:
+        node <- q.front()
+        q.pop()
+
+        if node.level == n - 1:
+            node.path.push_back(0)
+            node.cost += getDistance(dist, node.path[node.level], 0)
+            if node.cost < min_cost:
+                min_cost <- node.cost
+            continue
+
+        for i <- 1 to n - 1:
+            if i not in node.path:
+                child <- copy of node
+                child.path.push_back(i)
+                child.cost += getDistance(dist, node.path[node.level], i)
+                child.level <- node.level + 1
+                q.push(child)
+
+    return min_cost
+\end{lstlisting}
+
+\subsection{Least-Cost Search Pseudocode}
+\begin{lstlisting}[language=Python]
+function TSP_UCS(dist):
+    n <- size of dist
+    pq <- new PriorityQueue with Compare function
+    root <- new Node
+    root.path <- [0]
+    root.cost <- 0
+    root.level <- 0
+    pq.push(root)
+    min_cost <- INFINITY
+
+    while pq is not empty:
+        node <- pq.top()
+        pq.pop()
+
+        if node.level == n - 1:
+            node.path.push_back(0)
+            node.cost += dist[node.path[node.level]][0]
+            if node.cost < min_cost:
+                min_cost <- node.cost
+            continue
+
+        for i <- 1 to n - 1:
+            if i not in node.path:
+                child <- copy of node
+                child.path.push_back(i)
+                child.cost += dist[node.path[node.level]][i]
+                child.level <- node.level + 1
+                pq.push(child)
+
+    return min_cost
+\end{lstlisting}
+
+\subsection{A* Search Pseudocode}
+\begin{lstlisting}[language=Python]
+function heuristic(dist, node):
+    n <- size of dist
+    min_edge <- INFINITY
+    for i <- 0 to n - 1:
+        if i not in node.path:
+            min_edge <- min(min_edge, dist[node.path.back()][i])
+    return min_edge if min_edge != INFINITY else 0
+
+function TSP_AStar(dist):
+    n <- size of dist
+    pq <- new PriorityQueue with Compare function
+    root <- new Node
+    root.path <- [0]
+    root.cost <- 0
+    root.level <- 0
+    root.f_cost <- 0 + heuristic(dist, root)
+    pq.push(root)
+    min_cost <- INFINITY
+
+    while pq is not empty:
+        node <- pq.top()
+        pq.pop()
+        if node.level == n - 1:
+            node.path.push_back(0)
+            node.cost += dist[node.path[node.level]][0]
+            if node.cost < min_cost:
+                min_cost <- node.cost
+            continue
+        for i <- 1 to n - 1:
+            if i not in node.path:
+                child <- copy of node
+                child.path.push_back(i)
+                child.cost += dist[node.path[node.level]][i]
+                child.level <- node.level + 1
+                child.f_cost <- child.cost + heuristic(dist, child)
+                pq.push(child)
+
+    return min_cost
+\end{lstlisting}
+
+
+
+\section{Application outline}
+
+\subsection{High-Level Architectural Overview}
+The program is designed to solve the Traveling Salesman Problem (TSP) using three different strategies: Breadth-First Search (BFS), Least-Cost (Uniform Cost) Search (UCS), and A* Search. Each strategy aims to find the route of minimum cost that visits each city exactly once and returns to the origin city while minimizing the longest distance between two consecutive cities.
+
+\subsection{Input Data Format Specification}
+The input data format consists of:
+\begin{itemize}
+    \item The input data consists of a list of cities. Each city is represented by a pair of coordinates (x, y), and the distance between two cities is calculated using the Euclidean distance formula.
+
+\end{itemize}
+
+\subsection{Output Data Format Specification}
+The output data format includes:
+\begin{itemize}
+    \item The output data is the route of minimum cost that satisfies the TSP criteria. 
+    \item Additionally the executiion time of the route is provided.
+\end{itemize}
+
+\subsection{Modules in the Application}
+
+\subsubsection{Breadth-First Search (BFS) Module}
+\textbf{Function:} \texttt{TSP\_BFS(dist:List[List[int]])}
+
+\textbf{Description:} This function implements the Breadth-First Search (BFS) algorithm to find the minimum cost route that visits each city exactly once and returns to the origin city, minimizing the longest distance between two consecutive cities.
+
+\textbf{Algorithm Explanation:}
+\begin{itemize}
+    \item The BFS algorithm explores all possible paths level by level starting from the origin city.
+    \item It uses a queue to manage the paths being explored.
+    \item Initially, the root node (representing the origin city with zero cost and at level 0) is placed in the queue.
+    \item At each iteration, the algorithm dequeues a node, and if it represents a complete tour (all cities visited), it updates the minimum cost if this tour is cheaper than previously found tours.
+    \item If not all cities are visited yet, the algorithm generates all possible successor nodes by extending the current path to each unvisited city and enqueues them.
+    \item The process continues until the queue is empty, ensuring that all possible tours are explored.
+    \item The function returns the minimum cost of all possible tours.
+\end{itemize}
+
+\subsubsection{UCS Strategy Module}
+\textbf{Function:} \texttt{'TSP\_UCS(dist: List[List[int]])}
+
+\textbf{Description:} This function implements the Uniform Cost Search (UCS) algorithm to find the minimum cost route that visits each city exactly once and returns to the origin city, minimizing the longest distance between two consecutive cities.
+
+\textbf{Algorithm Explanation:}
+\begin{itemize}
+    \item UCS uses a priority queue to explore paths in the order of increasing cost.
+    \item The initial state starts with the origin city with zero cost and is pushed into the priority queue.
+    \item The algorithm dequeues the node with the lowest cost, expanding it to generate successor nodes by visiting neighboring cities..
+    \item Each successor node represents a path extending to a new city, and its cost is updated accordingly.
+    \item These successor nodes are then added to the priority queue.
+    \item If a node represents a complete tour, the algorithm checks if its cost is the lowest encountered so far and updates the minimum cost if it is.
+    \item The algorithm continues until the priority queue is empty, ensuring that all potential tours are considered.
+    \item Finally, the function returns the minimum cost of the route found.
+\end{itemize}
+
+\subsubsection{A* Search Module}
+\textbf{Function:} \texttt{heuristic(const vector<bool>& visited, int current\_city)}
+
+\textbf{Description:} This heuristic function estimates the minimum cost to complete the route from the current state of the node. It is used by the A* Search algorithm to prioritize nodes in the priority queue.
+
+\textbf{Algorithm Explanation:}
+\begin{itemize}
+    \item The heuristic function calculates the minimum edge cost from the current city to any unvisited city.
+    \item It combines two components:
+    \item It iterates over all cities and finds the minimum distance to an unvisited city.
+    \item This minimum distance is used as the heuristic estimate (h\_cost) to guide the A* Search algorithm towards the goal.
+\end{itemize}
+
+\textbf{Function:} \texttt{'TSP\_AStar(dist: List[List[int]])}
+
+\textbf{Description:} This function implements the A* Search algorithm with a heuristic function to find the minimum cost route that visits each city exactly once and returns to the origin city, minimizing the longest distance between two consecutive cities.
+
+\textbf{Algorithm Explanation:}
+\begin{itemize}
+    \item A* Search uses a priority queue to manage the nodes, with nodes prioritized based on their total estimated cost (f\_cost), which is the sum of the path cost (g\_cost) and a heuristic estimate (h\_cost).
+    \item The initial state contains the origin city with zero cost, and its estimated cost is calculated using a heuristic function.
+    \item The algorithm dequeues the node with the lowest estimated cost and generates successor nodes by visiting each unvisited neighboring city.
+    \item For each successor node, the path cost is updated, and the heuristic cost is recalculated.
+    \item These successor nodes are then pushed into the priority queue based on their total estimated cost.
+    \item When a node represents a complete tour, the algorithm updates the minimum cost if this tour's cost is lower than previously found tours.
+    \item The search continues until all nodes are explored, ensuring that the optimal route is found.
+    \item The heuristic function plays a crucial role in guiding the search efficiently, potentially reducing the number of paths that need to be explored.
+    \item The function returns the minimum cost of the TSP route.
+\end{itemize}
+
+\subsection*{Utilities Module}
+
+\texttt{calculateDistance(pair<int, int> point1, pair<int, int> point2}
+
+\subsubsection*{Description}
+Calculates the Euclidean distance between two points.
+
+\subsubsection*{Parameters}
+\begin{itemize}
+    \item \texttt{point1}: A pair of integers representing the coordinates of the first point.
+    \item \texttt{point2}: : A pair of integers representing the coordinates of the second point.
+\end{itemize}
+
+\subsubsection*{Return value}
+Returns an integer representing the Euclidean distance between the two points.\\
+
+\item
+\texttt{vector<pair<int, int>> TSP\_parseFile(const string& filename, int& n) }
+
+\subsubsection*{Description}
+This function parses a .tsp file containing coordinates of nodes and extracts the number of nodes and their coordinates from the file and returns them as a vector of pairs, where each pair represents the x and y coordinates of a node.
+
+\subsubsection*{Parameters}
+\begin{itemize}
+    \item \texttt {filename}: A constant reference to a string representing the name of the file to be parsed.
+    \item \texttt {n}: An integer reference representing the number of nodes in the TSP instance. This parameter is modified within the function to store the extracted value.
+\end{itemize}
+
+\subsubsection*{Return value}
+The function returns a vector of pairs, where each pair represents the x and y coordinates of a node in the TSP instance.
+
+\item
+\texttt{parseTSP(const string\& filename)}
+
+\subsubsection*{Description}
+This function parses a .tsp file to extract information about city coordinates and calculates distances between cities based on their coordinates.
+
+\subsubsection*{Parameters}
+\begin{itemize}
+    \item \texttt{filename}: A constant reference to a string representing the name of the .tsp file to be parsed.
+\end{itemize}
+
+\subsubsection*{Return Value}
+This function does not return a value.
+
+\begin{itemize}
+    \item The description of what the function does
+    \item The description of each parameter, and
+    \item The meaning of the return value
+\end{itemize}
+\\
+
+\item
+\texttt{getDistance(const vector<vector<int>>& dist, int i, int j)}
+
+\subsubsection*{Description}
+Retrieves the distance between two points from the distance matrix.
+
+\subsubsection*{Parameters}
+\begin{itemize}
+    \item \texttt {dist}: A constant reference to a 2D vector representing the distance matrix between points.
+    \item \texttt i: An integer representing the index of the first point.
+    \item \texttt j: An integer representing the index of the second point.
+\end{itemize}
+
+\subsubsection*{Return Value}
+Return Value: Returns an integer representing the distance between the two points.
+
+
+
+\item
+
+\section*{Breadth-First Search (BFS) Module}
+\texttt{TSP\_BFS(const vector<vector<int>>& dist, int n)}
+\subsection*{Description}
+Implements the Breadth-First Search algorithm to explore all possible paths level by level, starting from the origin city, to find the minimum cost TSP route.
+\subsection*{Parameters}
+\begin{itemize}
+    \item \texttt {dist}: A constant reference to a 2D vector representing the distance matrix between points.
+    \item \texttt{n}: An integer representing the number of points in the problem.
+    \item \texttt{cost}: Represents the cumulative cost of the current route from the origin city to the current city.
+    \item \texttt{start}: Indicates the starting city of the route.
+\end{itemize}
+\subsection*{Internal Parameters}
+\begin{itemize}
+    \item \texttt {q}: A queue of Node objects used to manage the paths being explored.
+    \item \texttt{root}: A Node object representing the initial state, with the origin city as the starting point.
+    \item \texttt{min\_cost}: An integer initialized to INT\_MAX to track the minimum cost of all explored paths.
+\end{itemize}
+\subsection*{Return Value}
+An integer representing the minimum cost of the TSP route. This value is calculated by exploring all possible paths using BFS and selecting the path with the lowest total cost.
+\subsection*{Algorithm Steps}
+\subsubsection*{Initialization}
+\begin{itemize}
+    \item Initialize a queue q to manage the nodes.
+    \item Create a Node object root to represent the starting point, with an initial path containing the origin city, zero cost, and level zero.
+    \item Initialize min\_cost to INT\_MAX.
+\end{itemize}
+\subsubsection*{Exploration}
+\begin{itemize}
+    \item While the queue is not empty:
+    \item Dequeue the front node and check if it represents a complete tour (all cities visited). If so, add the return cost to the origin city and update min\_cost if this tour's cost is lower.
+    \item If not all cities are visited, generate all possible successor nodes by extending the current path to each unvisited city and enqueue them.
+    \end{itemize}
+\subsubsection*{Completion}
+Return min\_cost as the minimum cost of all explored paths.
+
+\section*{UCS Strategy Module}
+\texttt{TSP\_UCS(const vector<vector<int>>& dist)}
+\subsection*{Description}
+Implements the Uniform Cost Search algorithm to explore paths based on their increasing cost, starting from the origin city, to find the minimum cost TSP route.
+\subsection*{Parameters}
+\begin{itemize}
+    \item \texttt{dist:} A constant reference to a 2D vector representing the distance matrix between points.
+    \end{itemize}
+\subsection*{Internal Parameters}
+\begin{itemize}
+    \item \texttt{n}: An integer representing the number of cities, derived from the size of dist.
+    \item \texttt{pq}: A priority queue of Node objects, ordered by path cost.
+    \item \texttt{root}: A Node object representing the initial state, with the origin city as the starting point.
+    \item \texttt{min\_cost}: An integer initialized to INT\_MAX to track the minimum cost of all explored paths.
+
+\end{itemize}
+\subsection*{Return Value}
+An integer representing the minimum cost of the TSP route. The UCS algorithm ensures that the path with the lowest cumulative cost is explored first, leading to an optimal solution.
+\subsection*{Algorithm Steps}
+\subsubsection*{Initialization}
+\begin{itemize}
+    \item Determine the number of cities n from the size of dist.
+    \item Initialize a priority queue pq to manage the nodes.
+    \item Create a Node object root to represent the starting point, with an initial path containing the origin city, zero cost, and level zero.
+    \item Initialize min\_cost to INT\_MAX.
+    \end{itemize}
+\subsubsection*{Exploration}
+\begin{itemize}
+    \item While the priority queue is not empty:
+    \item Dequeue the node with the lowest cost and check if it represents a complete tour (all cities visited). If so, add the return cost to the origin city and update min\_cost if this tour's cost is lower.
+    \item If not all cities are visited, generate all possible successor nodes by extending the current path to each unvisited city and enqueue them.
+\end{itemize}
+
+\subsubsection*{Completion}
+Return min\_cost as the minimum cost of all explored paths.
+
+\subsection*{A* Search Module}
+
+\texttt{heuristic(const vector<vector<int>>& dist, const Node& node)}
+
+\subsubsection*{Description}
+Estimates the minimum cost to complete the route from the current state of the node. This heuristic helps in guiding the A* Search algorithm efficiently.
+
+\subsubsection*{Parameters}
+\begin{itemize}
+    \item \texttt{dist}: A constant reference to a 2D vector representing the distance matrix between points.
+    \item \texttt{node}: A constant reference to a Node structure representing the current state in the search.
+\end{itemize}
+\subsection*{Internal Parameters}
+\begin{itemize}
+    \item \texttt{n}: An integer representing the number of cities, derived from the size of dist.
+\end{itemize}
+\subsubsection*{Return Value}
+\texttt An integer representing the heuristic estimate of the minimum cost to complete the route from the current state. This value is used to guide the A* Search algorithm towards the goal more efficiently.\\
+
+\texttt{TSP\_AStar(const vector<vector<int>>& dist)}
+
+\subsubsection*{Description}
+Implements the A* Search algorithm with a heuristic function to find the minimum cost route that visits each city exactly once and returns to the origin city, minimizing the longest distance between two consecutive cities.
+
+\subsubsection*{Parameters}
+\begin{itemize}
+    \item \texttt{dist}: A constant reference to a 2D vector representing the distance matrix between points.
+\end{itemize}
+
+\subsubsection*{Internal Parameters}
+\begin{itemize}
+    \item \texttt{n}: An integer representing the number of cities, derived from the size of dist.
+    \item \texttt{pq}: A priority queue of Node objects, ordered by their estimated total cost (f\_cost).
+    \item \texttt{root}: A Node object representing the initial state, with the origin city as the starting point.
+    \item \texttt{min\_cost}: An integer initialized to INT\_MAX to track the minimum cost of all explored paths.
+\end{itemize}
+
+\subsubsection*{Return Value}
+An integer representing the minimum cost of the TSP route. The A* Search algorithm combines the actual cost from the start node to the current node and the estimated cost from the current node to the goal, ensuring an efficient pathfinding process.
+
+
+
+\subsubsection*{Algorithm Steps}
+
+\textbf{Initialization:}
+\begin{itemize}
+    \item Determine the number of cities n from the size of dist.
+    \item Initialize a priority queue pq to manage the nodes.
+    \item Create a Node object root to represent the starting point, with an initial path containing the origin city, zero cost, level zero, and an estimated cost using the heuristic function.
+    \item Initialize min\_cost to INT\_MAX.
+\end{itemize}
+
+\textbf{Exploration:}
+\begin{itemize}
+    \item While the priority queue is not empty:
+    \item Dequeue the node with the lowest estimated total cost and check if it represents a complete tour (all cities visited). If so, add the return cost to the origin city and update min\_cost if this tour's cost is lower.
+    \item If not all cities are visited, generate all possible successor nodes by extending the current path to each unvisited city, updating their costs and heuristic estimates, and enqueue them.
+\end{itemize}
+
+\textbf{Completion:}
+\begin{itemize}
+    \item Return min\_cost as the minimum cost of all explored paths.
+\end{itemize}
+
+
+
+
+\section{Experiments and Evaluation}
+This section requires a description of the generated data or the datasets used in the experiments. The description of the experimental setup and the results must be included here.
+
+Initially, I created a small dataset with five cities at coordinates: \{0, 1\}, \{1, 0\}, \{2, 0\}, \{2, 1\}, and \{1, 2\}. Then, I applied each of the algorithms—TSP\_BFS, TSP\_UCS, and TSP\_AStar—to determine the minimum cost and execution time.
+
+For larger datasets obtained from the TSP-LIB site (s70.tsp, bier127.tsp, and eli101.tsp), I modified them to reduce the number of cities to 9, 10, and 11, respectively. This adjustment was made to mitigate the high time complexity of the BFS algorithm, which grows substantially with the number of cities.
+
+The results of all algorithms for each dataset were compiled into an Excel file. In addition, I created two charts to illustrate the exponential growth of execution time in microseconds and to demonstrate that the minimum cost remains consistent regardless of the algorithm used for a particular dataset.
+
+\begin{figure}[htbp] 
+    \centering
+    \includegraphics[width=0.8\textwidth]{experiment_ai.png}
+    \label{fig:experiment_image}
+\end{figure}
+\\\
+
+
+\section{Conclusion}
+
+By solving this assignment, I have improved my knowledge of how searching algorithms work and how to manage computing time to check for efficiency.
+\\
+I opted to use C++ as my programming language due to my familiarity with it, as I am most efficient when using it. This experience allows me to make full use of its features to find the most optimal solution for the different tasks given in the assignment. 
+
+\section{References}
+\begin{enumerate}
+    \item Graph Traversals - BFS & DFS -Breadth First Search and Depth First Search , \url{https://www.youtube.com/watch?v=pcKY4hjDrxk&t=1s}
+    \item  \url{https://www.geeksforgeeks.org/traveling-salesman-problem-tsp-implementation/}
+    \item  \url{https://www.geeksforgeeks.org/breadth-first-search-or-bfs-for-a-graph/}
+    \item  \url{https://www.geeksforgeeks.org/uniform-cost-search-dijkstra-for-large-graphs/}
+    \item  \url{https://www.geeksforgeeks.org/heuristic-search-techniques-in-ai/}
+    \item  \url{https://www.geeksforgeeks.org/a-search-algorithm/}
+    \item Files for parsing from TSLIB: \url{http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/}
+        
+\end{enumerate}
+
+
+\end{document}
 
