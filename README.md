@@ -1,14 +1,25 @@
-# I have created 3 projects in order to compute the minmum cost for the simple predefined data:
-Istudor_Eduard_BFS  for the BFS algorithm
-Istudor_Eduard_UniformCost for the UCS algorithm
-Istudor_Eduard_A_Star_Search for the A* algorithm
+# Minimum Cost Computation Projects
 
-# After that, for each of the aglorithms above I have added a file parser that enables reading inputs from a .tsp file:
-Istudor_Eduard_BFS _FileParser
-Istudor_Eduard_UniformCost_FileParser
-Istudor_Eduard_A_Star_Search _FileParser
+I have created 3 projects in order to compute the minimum cost for the simple predefined data:
+- **Istudor_Eduard_BFS** for the BFS algorithm
+- **Istudor_Eduard_UniformCost** for the UCS algorithm
+- **Istudor_Eduard_A_Star_Search** for the A* algorithm
 
-# The datasets I have chosen are st70_9(9 cities), bier127_10(10 cities), eil101_11(cities).
+Each algorithm has an additional project that includes a file parser to enable reading inputs from a `.tsp` file:
+- **Istudor_Eduard_BFS_FileParser**
+- **Istudor_Eduard_UniformCost_FileParser**
+- **Istudor_Eduard_A_Star_Search_FileParser**
 
-# In order to select from which file to read, the name inside the " " has to be changed to the desired file
-for example: string filename = "st70_9.tsp";
+## Datasets
+
+The datasets used for testing are:
+- `st70_9` (9 cities)
+- `bier127_10` (10 cities)
+- `eil101_11` (11 cities)
+
+## Usage
+
+To select from which file to read, change the name inside the quotes in the code as follows:
+
+```cpp
+string filename = "st70_9.tsp";
