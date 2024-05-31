@@ -1,4 +1,4 @@
-# Minimum Cost Computation Projects
+# The Traveling Salesman Problem
 
 I have created 3 projects in order to compute the minimum cost for the simple predefined data:
 - **Istudor_Eduard_BFS** for the BFS algorithm
@@ -19,7 +19,7 @@ The datasets used for testing are:
 
 ## Usage
 
-To select from which file to read, change the name inside the quotes in the code as follows:
+To select from which file to read, change the name inside the quotes in the code as one of the 3 datasets provided like for example:
 
 ```cpp
 string filename = "st70_9.tsp";
